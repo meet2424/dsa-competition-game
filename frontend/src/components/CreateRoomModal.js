@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import copy from 'copy-to-clipboard';
 import { Dialog, Box, Typography } from '@mui/material';
@@ -15,8 +15,24 @@ import CloseIcon from '@mui/icons-material/Close';
 import { MdContentCopy, MdPeopleAlt } from 'react-icons/md';
 import { AiOutlineUserAdd } from 'react-icons/ai';
 
+import io from 'socket.io-client';
+
+const socket = io.connect('http://localhost:5000/');
+
 export default function CreateRoomModal() {
-  const roomCode = 'https://gamelink.co.in/id#420?user/';
+  const [roomCode, setRoomCode] = useState('');
+
+  useEffect(() => {
+    // console.log('f');
+    socket.emit('create_room');
+
+    socket.on('return_room_id', (data) => {
+      setRoomCode(data.roomId);
+      console.log(data.roomId);
+    });
+  }, [socket]);
+
+  // const roomCode = 'https://gamelink.co.in/id#420?user/';
   const [open, setOpen] = useState(true);
   const [difficulty, setDifficulty] = useState('Intermediate');
 
@@ -47,7 +63,26 @@ export default function CreateRoomModal() {
   };
 
   const onSubmit = (data) => {
+    const {
+      playersLimit,
+      rounds,
+      difficulty,
+      timeLimit,
+      additionalInfo,
+    } = data;
     console.log(data);
+    socket.emit('create_room_info', {
+      playersLimit,
+      userId: '62710f48fee2c40536fc062a',
+      difficulty,
+      rounds,
+      timeLimitPerQ: timeLimit,
+      additionalInfo,
+    });
+
+    socket.on('room_status', (data) => {
+      console.log(data);
+    });
     setOpen(false);
   };
 

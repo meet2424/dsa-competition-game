@@ -8,9 +8,26 @@ import Button from '@mui/material/Button';
 import { BsPersonCircle } from 'react-icons/bs';
 import { FaChevronRight } from 'react-icons/fa';
 
+import io from 'socket.io-client';
+
+const socket = io.connect('http://localhost:5000/');
+
 export default function JoinRoomModal() {
+  const [players, SetPlayers] = useState([]);
+  //Dummy data for now
+  const roomId = '#0d4fb8d9d304';
+  const userId = '62710f48fee2c40536fc062a';
+
+  useEffect(() => {
+    socket.emit('join_room', {
+      userId,
+      roomId,
+    });
+
+    socket.to();
+  });
   // Dummy Participants
-  const players = ['User 1', 'Player 2', 'Player 3'];
+  // const players = ['User 1', 'Player 2', 'Player 3'];
 
   return (
     <Dialog
